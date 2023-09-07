@@ -8,7 +8,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@MapperScan("cn.shh.test.mybatisplus.mapper")
+@MapperScan("cn.shh.test.es.mapper")
 @Configuration
 public class MybatisPlusConfig {
     @Bean

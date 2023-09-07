@@ -1,4 +1,4 @@
-package cn.shh.test.es.controller;
+package cn.shh.test.es.mapper.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
