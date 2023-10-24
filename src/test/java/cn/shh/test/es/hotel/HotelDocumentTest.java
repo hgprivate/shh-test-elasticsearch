@@ -23,8 +23,6 @@ import java.io.IOException;
 @SpringBootTest
 public class HotelDocumentTest {
     @Autowired
-    private IHotelService hotelService;
-    @Autowired
     private ElasticsearchClient elasticsearchClient;
 
     @Test

@@ -32,8 +32,6 @@ public class IndexBulkTest {
 
     /**
      * 批量操作多个索引
-     *
-     * @throws IOException
      */
     @Test
     public void test() throws IOException {

@@ -26,8 +26,6 @@ public class ReadTest {
 
     /**
      * 根据ID来读取单个document
-     *
-     * @throws IOException
      */
     @Test
     public void getById() throws IOException {

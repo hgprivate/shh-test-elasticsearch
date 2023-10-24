@@ -34,7 +34,6 @@ public class SearchTest {
 
     /**
      * 简单搜索
-     * @throws IOException
      */
     @Test
     public void simpleSearch() throws IOException {
@@ -63,7 +62,6 @@ public class SearchTest {
 
     /**
      * 嵌套搜索
-     * @throws Exception
      */
     @Test
     public void searchNested() throws Exception {
@@ -95,7 +93,6 @@ public class SearchTest {
 
     /**
      * 模板化搜索
-     * @throws Exception
      */
     @Test
     public void searchTemplate() throws Exception {

@@ -38,8 +38,6 @@ public class HotelSearchTest {
 
     /**
      * 匹配所有的文档数据
-     *
-     * @throws IOException
      */
     @Test
     public void matchAll() throws IOException {
@@ -52,7 +50,6 @@ public class HotelSearchTest {
 
     /**
      * 匹配 某个字段值符合要求的数据
-     * @throws IOException
      */
     @Test
     public void matchQuery() throws IOException {
@@ -70,7 +67,6 @@ public class HotelSearchTest {
 
     /**
      * 组合查询
-     * @throws IOException
      */
     @Test
     public void testBool() throws IOException {
@@ -88,7 +84,6 @@ public class HotelSearchTest {
 
     /**
      * 升序/降序展示，且限定展示数据的条数
-     * @throws IOException
      */
     @Test
     public void testPageAndSort() throws IOException {
@@ -104,7 +99,6 @@ public class HotelSearchTest {
 
     /**
      * 测试高亮效果
-     * @throws IOException
      */
     @Test
     public void testHightlight() throws IOException {

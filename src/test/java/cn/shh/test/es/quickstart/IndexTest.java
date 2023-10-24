@@ -27,8 +27,6 @@ public class IndexTest {
 
     /**
      * 基于 DSL 来创建并插入一条文档数据
-     *
-     * @throws IOException
      */
     @Test
     public void test1() throws IOException {

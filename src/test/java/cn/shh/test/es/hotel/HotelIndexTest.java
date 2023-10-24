@@ -61,8 +61,6 @@ public class HotelIndexTest {
 
     /**
      * 删除 hotel 的index
-     *
-     * @throws IOException
      */
     @Test
     public void deleteHotelIndex() throws IOException {
@@ -80,8 +78,6 @@ public class HotelIndexTest {
 
     /**
      * 检测某个index是否存在
-     *
-     * @throws IOException
      */
     @Test
     public void existsIndex() throws IOException {

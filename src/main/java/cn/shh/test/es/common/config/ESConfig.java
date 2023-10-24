@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(ESProperties.class)
 @Configuration
 public class ESConfig {
-    @Bean
+    /*@Bean
     public RestClient restClient(ESProperties properties){
         return RestClient.builder(new HttpHost(properties.getAddress(), properties.getPort())).build();
     }
@@ -24,5 +24,5 @@ public class ESConfig {
     @Bean
     public ElasticsearchClient elasticsearchClient(ElasticsearchTransport elasticsearchTransport){
         return new ElasticsearchClient(elasticsearchTransport);
-    }
+    }*/
 }
