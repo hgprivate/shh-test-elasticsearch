@@ -12,17 +12,19 @@ import org.springframework.context.annotation.Configuration;
 
 @EnableConfigurationProperties(ESProperties.class)
 @Configuration
-public class ESConfig {
-    /*@Bean
-    public RestClient restClient(ESProperties properties){
-        return RestClient.builder(new HttpHost(properties.getAddress(), properties.getPort())).build();
+public class ES7Config {
+    private final String httpcacrt = "/Users/shh/Java/cache/certs/es/http_ca.crt";
+
+    @Bean
+    public RestClient restClient(){
+        return RestClient.builder(new HttpHost("127.0.0.1", 9200)).build();
     }
     @Bean
-    public ElasticsearchTransport elasticsearchTransport(RestClient restClient){
-        return new RestClientTransport(restClient, new JacksonJsonpMapper());
+    public ElasticsearchTransport elasticsearchTransport(){
+        return new RestClientTransport(restClient(), new JacksonJsonpMapper());
     }
     @Bean
-    public ElasticsearchClient elasticsearchClient(ElasticsearchTransport elasticsearchTransport){
-        return new ElasticsearchClient(elasticsearchTransport);
-    }*/
+    public ElasticsearchClient elasticsearchClient(){
+        return new ElasticsearchClient(elasticsearchTransport());
+    }
 }

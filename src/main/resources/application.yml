@@ -9,9 +9,9 @@ spring:
     username: root
     password: mysql368.cn
   elasticsearch:
-    uris: http://localhost:9200
-    username: elastic
-    password: es368.cn
+    uris: https://localhost:9200
+    #username: elastic
+    #password: eCdL0mg9Z7snI6w2Coxr
     connection-timeout: 5s
     socket-timeout: 30s
     socket-keep-alive: false
