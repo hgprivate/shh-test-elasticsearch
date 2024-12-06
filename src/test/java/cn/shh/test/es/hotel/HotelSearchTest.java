@@ -24,9 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 作者：shh
- * 时间：2023/6/27
- * 版本：v1.0
+ * 索引hotel下的查询操作
  */
 @Slf4j
 @SpringBootTest
@@ -40,37 +38,28 @@ public class HotelSearchTest {
     }
 
     /**
-     * 匹配所有的文档数据
+     * 查询所有的文档数据
      */
     @Test
     public void matchAll() throws IOException {
         SearchResponse<Hotel> searchResponse = elasticsearchClient.search(
                 new SearchRequest.Builder().index("hotel")
-                        .query(
-                                QueryBuilders.matchAll()
-                                        .build()._toQuery()
-                        )
-                        .build(),
-                Hotel.class
-        );
+                        .query(QueryBuilders.matchAll().build()._toQuery())
+                        .build(), Hotel.class);
         handlerSearchResponse(searchResponse);
     }
 
     /**
-     * 匹配 某个字段值符合要求的数据
+     * 查询符合字段值要求的文档数据
      */
     @Test
     public void matchQuery() throws IOException {
         SearchResponse<Hotel> searchResponse = elasticsearchClient.search(
                 new SearchRequest.Builder().index("hotel")
-                        .query(
-                                QueryBuilders.match()
+                        .query(QueryBuilders.match()
                                         .field("name").query("如家")
-                                        .build()._toQuery()
-                        )
-                        .build(),
-                Hotel.class
-        );
+                                        .build()._toQuery())
+                        .build(), Hotel.class);
         handlerSearchResponse(searchResponse);
     }
 
@@ -81,36 +70,24 @@ public class HotelSearchTest {
     public void testBool() throws IOException {
         SearchResponse<Hotel> boolSearchResponse = elasticsearchClient.search(
                 new SearchRequest.Builder().index("hotel")
-                        .query(
-                                QueryBuilders.bool()
-                                        .must(
-                                                QueryBuilders.term()
-                                                        .field("city").value("上海")
-                                                        .build()._toQuery()
-                                        )
-                                        .filter(
-                                                QueryBuilders.range()
-                                                        .field("price").lte(JsonData.of(200))
-                                                        .build()._toQuery()
-                                        )
-                                        .build()._toQuery()
-                        )
-                        .build(),
-                Hotel.class
-        );
+                        .query(QueryBuilders.bool()
+                                .must(QueryBuilders.term()
+                                        .field("city").value("上海").build()._toQuery())
+                                .filter(QueryBuilders.range()
+                                        .field("price").lte(JsonData.of(200)).build()._toQuery())
+                                .build()._toQuery()
+                        ).build(), Hotel.class);
         handlerSearchResponse(boolSearchResponse);
     }
 
     /**
-     * 升序/降序展示，且限定展示数据的条数
+     * 分页和排序
      */
     @Test
     public void testPageAndSort() throws IOException {
         SearchResponse<Hotel> searchResponse = elasticsearchClient.search(
                 new SearchRequest.Builder().index("hotel")
-                        .query(
-                                QueryBuilders.matchAll().build()._toQuery()
-                        )
+                        .query(QueryBuilders.matchAll().build()._toQuery())
                         .sort(
                                 SortOptionsBuilders.field(builder -> builder.field("id").order(SortOrder.Asc)),
                                 SortOptionsBuilders.field(builder -> builder.field("price").order(SortOrder.Asc))
@@ -118,33 +95,23 @@ public class HotelSearchTest {
                         .from(0)
                         .size(5)
                         .build(),
-                Hotel.class
-        );
+                Hotel.class);
         handlerSearchResponse(searchResponse);
     }
 
     /**
-     * 测试高亮效果
+     * 高亮效果
      */
     @Test
     public void testHightlight() throws IOException {
         SearchResponse<Hotel> searchResponse = elasticsearchClient.search(
                 new SearchRequest.Builder().index("hotel")
-                        .query(
-                                QueryBuilders.match().field("name").query("假日").build()._toQuery()
-                        )
-                        .highlight(
-                                hightlightBuilder -> hightlightBuilder
-                                        .fields(
-                                                "name",
-                                                hightlightFieldBuilder -> hightlightFieldBuilder
+                        .query(QueryBuilders.match().field("name").query("假日").build()._toQuery())
+                        .highlight(hightlightBuilder -> hightlightBuilder
+                                        .fields("name", hightlightFieldBuilder -> hightlightFieldBuilder
                                                         .matchedFields("name", "address")
-                                                        .requireFieldMatch(false)
-                                        )
-                        )
-                        .build(),
-                Hotel.class
-        );
+                                                        .requireFieldMatch(false))
+                        ).build(), Hotel.class);
         log.info("searchResponse: {}", searchResponse);
         List<Hit<Hotel>> hitList = searchResponse.hits().hits();
         hitList.get(1).highlight().get("name").forEach(System.out::println);
@@ -160,7 +127,7 @@ public class HotelSearchTest {
     }
 
     /**
-     * 多个字段匹配
+     * 多字段匹配
      *
      * @throws IOException
      */
@@ -168,14 +135,9 @@ public class HotelSearchTest {
     public void testMatchQuery() throws IOException {
         SearchResponse<Hotel> searchResponse = elasticsearchClient.search(
                 new SearchRequest.Builder().index("hotel")
-                        .query(
-                                QueryBuilders.multiMatch()
-                                        .fields("name", "brand").query("速8")
-                                        .build()._toQuery()
-                        )
-                        .build(),
-                Hotel.class
-        );
+                        .query(QueryBuilders.multiMatch()
+                                .fields("name", "brand").query("速8").build()._toQuery())
+                        .build(), Hotel.class);
         List<Hit<Hotel>> hitList = searchResponse.hits().hits();
         for (Hit<Hotel> hotelHit : hitList) {
             Hotel hotel = hotelHit.source();
@@ -187,25 +149,16 @@ public class HotelSearchTest {
     public void testAggregation() throws IOException {
         SearchResponse<Hotel> searchResponse = elasticsearchClient.search(
                 new SearchRequest.Builder().index("hotel")
-                        .query(
-                                QueryBuilders.matchAll().build()._toQuery()
-                        )
+                        .query(QueryBuilders.matchAll().build()._toQuery())
                         .size(0)
-                        .aggregations(
-                                "brandAgg",
-                                aggBuilder -> aggBuilder.terms(
+                        .aggregations("brandAgg", aggBuilder -> aggBuilder.terms(
                                         termAggBuilder -> termAggBuilder.field("brand.keyword")
-                                ).aggregations(
-                                        "priceStats",
-                                        aggBuilder2 -> aggBuilder2.stats(
-                                                statsAggBuilder -> statsAggBuilder.field("price")
-                                        )
+                                ).aggregations("priceStats", aggBuilder2 -> aggBuilder2.stats(
+                                                statsAggBuilder -> statsAggBuilder.field("price"))
                                 )
-                        )
-                        .build(),
-                Hotel.class
-        );
-        List<StringTermsBucket> stringTermsBuckets = searchResponse.aggregations().get("brandAgg").sterms().buckets().array();
+                        ).build(), Hotel.class);
+        List<StringTermsBucket> stringTermsBuckets = searchResponse.aggregations()
+                .get("brandAgg").sterms().buckets().array();
         for (StringTermsBucket stringTermsBucket : stringTermsBuckets) {
             StatsAggregate priceStats = stringTermsBucket.aggregations().get("priceStats").stats();
             log.info("key: {}, doc_count: {}, priceStats: {count: {}, min: {}, max: {}, avg: {}, sum: {}}",

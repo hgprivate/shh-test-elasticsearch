@@ -16,13 +16,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * elasticsearch-java client之索引操作
+ * client elasticsearch-java 索引操作
  */
 @SpringBootTest
 public class IndexTest {
     private final String INDEX_NAME = "product";
     @Autowired
     private ElasticsearchClient elasticsearchClient;
+
+    @Test
+    public void getInstance(){
+        System.out.println("elasticsearchClient = " + elasticsearchClient);
+    }
 
     /**
      * 创建索引并添加一条文档数据
@@ -36,7 +41,7 @@ public class IndexTest {
                 .id(product.getSku())
                 .document(product)
         );
-        System.out.println("Indexed with version " + response.version());
+        System.out.println("Indexed with version " + response.version()); // 从1开始递增，每次加1。
     }
 
     /**
@@ -50,9 +55,7 @@ public class IndexTest {
         indexReqBuilder.index(INDEX_NAME);
         indexReqBuilder.id(product.getSku());
         indexReqBuilder.document(product);
-
         IndexResponse response = elasticsearchClient.index(indexReqBuilder.build());
-
         System.out.println("Indexed with version " + response.version());
     }
 

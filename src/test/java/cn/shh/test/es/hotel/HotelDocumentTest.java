@@ -15,9 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
 
 /**
- * 作者：shh
- * 时间：2023/6/26
- * 版本：v1.0
+ * 索引hotel下的文档查询操作
  */
 @Slf4j
 @SpringBootTest
@@ -43,13 +41,12 @@ public class HotelDocumentTest {
         IndexResponse indexResponse = elasticsearchClient.index(i -> i
                 .index("hotel")
                 .id(hotel.getId().toString())
-                .document(hotel)
-        );
+                .document(hotel));
         log.info("indexResponse: {}", indexResponse.index());
     }
 
     /**
-     * 根据id获取一条文档数据
+     * 根据id获取文档
      */
     @Test
     public void getById() throws IOException {
@@ -70,7 +67,6 @@ public class HotelDocumentTest {
     public void updateDocument() throws IOException {
         Hotel hotel = elasticsearchClient.get(g -> g
                 .index("hotel").id("12345678"), Hotel.class).source();
-
         hotel.setName("测试酒店666");
         UpdateRequest.Builder builder = new UpdateRequest.Builder<Hotel, Hotel>();
         builder.index("hotel");
@@ -81,7 +77,7 @@ public class HotelDocumentTest {
     }
 
     /**
-     * 根据id删除一条文档数据
+     * 根据id删除文档
      */
     @Test
     public void deleteById() throws IOException {
@@ -93,7 +89,7 @@ public class HotelDocumentTest {
     }
 
     /**
-     * 根据id删除一条文档数据
+     * 根据条件删除文档
      */
     @Test
     public void deleteAll() throws IOException {

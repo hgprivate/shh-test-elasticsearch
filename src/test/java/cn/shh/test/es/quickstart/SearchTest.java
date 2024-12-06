@@ -20,11 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * 作者：shh
- * 时间：2023/6/26
- * 版本：v1.0
- *
- * 搜索测试
+ * client elasticsearch-java 搜索操作
  */
 @Slf4j
 @SpringBootTest
@@ -37,11 +33,9 @@ public class SearchTest {
      */
     @Test
     public void simpleSearch() throws IOException {
-        String searchText = "bike";
-
         SearchResponse<Product> response = elasticsearchClient.search(s ->
                 s.index("product").query(q ->
-                        q.match(t -> t.field("name").query(searchText))
+                        q.match(t -> t.field("name").query("bike"))
                 ), Product.class);
 
         TotalHits total = response.hits().total();
@@ -67,21 +61,17 @@ public class SearchTest {
     public void searchNested() throws Exception {
         //transport.setResult(searchResponse);
         //tag::search-nested
-        String searchText = "bike";
-        double maxPrice = 200.0;
 
         // Search by product name
-        Query byName = MatchQuery.of(m -> m.field("name").query(searchText))._toQuery();
+        Query byName = MatchQuery.of(m -> m.field("name").query("bike"))._toQuery();
 
         // Search by max price
-        Query byMaxPrice = RangeQuery.of(r -> r.field("price").gte(JsonData.of(maxPrice)))._toQuery();
+        Query byMaxPrice = RangeQuery.of(r -> r.field("price").gte(JsonData.of(200.0)))._toQuery();
 
         // Combine name and price queries to search the product index
         SearchResponse<Product> response = elasticsearchClient.search(s -> s
                         .index("product")
-                        .query(q -> q.bool(b -> b.must(byName).must(byMaxPrice))),
-                Product.class
-        );
+                        .query(q -> q.bool(b -> b.must(byName).must(byMaxPrice))), Product.class);
 
         List<Hit<Product>> hits = response.hits().hits();
         for (Hit<Product> hit: hits) {
@@ -107,9 +97,7 @@ public class SearchTest {
                         .index("product")
                         .id("query-script") // <1>
                         .params("field", JsonData.of("name")) // <2>
-                        .params("value", JsonData.of("bike")),
-                Product.class
-        );
+                        .params("value", JsonData.of("bike")), Product.class);
 
         List<Hit<Product>> hits = response.hits().hits();
         for (Hit<Product> hit: hits) {

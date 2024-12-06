@@ -16,9 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * 作者：shh
- * 时间：2023/6/26
- * 版本：v1.0
+ * 对索引hotel的操作
  */
 @Slf4j
 @SpringBootTest
@@ -34,7 +32,7 @@ public class HotelIndexTest {
     }
 
     /**
-     * 创建 hotel 的index并插入数据
+     * 创建索引hotel，并插入数据
      */
     @Test
     public void createHotelIndex() throws IOException {
@@ -60,7 +58,7 @@ public class HotelIndexTest {
     }
 
     /**
-     * 删除 hotel 的index
+     * 删除索引hotel
      */
     @Test
     public void deleteHotelIndex() throws IOException {
@@ -77,7 +75,7 @@ public class HotelIndexTest {
     }
 
     /**
-     * 检测某个index是否存在
+     * 检查指定索引是否存在
      */
     @Test
     public void existsIndex() throws IOException {

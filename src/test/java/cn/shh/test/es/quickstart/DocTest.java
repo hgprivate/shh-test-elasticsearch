@@ -2,10 +2,7 @@ package cn.shh.test.es.quickstart;
 
 import cn.shh.test.es.pojo.Product;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.CreateRequest;
-import co.elastic.clients.elasticsearch.core.DeleteRequest;
-import co.elastic.clients.elasticsearch.core.GetResponse;
-import co.elastic.clients.elasticsearch.core.UpdateRequest;
+import co.elastic.clients.elasticsearch.core.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -15,11 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
 
 /**
- * 作者：shh
- * 时间：2023/6/26
- * 版本：v1.0
- *
- * 读取测试
+ * client elasticsearch-java 文档操作
  */
 @Slf4j
 @SpringBootTest
@@ -48,8 +41,7 @@ public class DocTest {
     @Test
     public void getById() throws IOException {
         GetResponse<Product> response = elasticsearchClient.get(g ->
-                        g.index("product").id("1"), Product.class);
-
+                        g.index("product").id("2"), Product.class);
         if (response.found()) {
             Product product = response.source();
             log.info("Product name：" + product.getName());
@@ -81,9 +73,10 @@ public class DocTest {
         product.setName("摩托车");
         product.setPrice(16000);
         product.setSku("sku2");
-        elasticsearchClient.update(UpdateRequest.of(builder ->
+        UpdateResponse<Product> updateResponse = elasticsearchClient.update(UpdateRequest.of(builder ->
                         builder.index(INDEX_NAME).id("2").doc(product)),
                 Product.class);
+        System.out.println("updateResponse = " + updateResponse);
     }
 
     /**
@@ -93,6 +86,8 @@ public class DocTest {
     @Test
     public void testDeleteDoc() throws IOException {
         //elasticsearchClient.delete(new DeleteRequest.Builder().index(INDEX_NAME).id("2").build());
-        elasticsearchClient.delete(DeleteRequest.of(builder -> builder.index(INDEX_NAME).id("2")));
+        DeleteResponse deleteResponse = elasticsearchClient.delete(DeleteRequest.of(
+                builder -> builder.index(INDEX_NAME).id("2")));
+        System.out.println("deleteResponse = " + deleteResponse);
     }
 }

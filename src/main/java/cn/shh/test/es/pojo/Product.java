@@ -1,10 +1,5 @@
 package cn.shh.test.es.pojo;
 
-/**
- * 作者：shh
- * 时间：2023/6/26
- * 版本：v1.0
- */
 public class Product {
     private String sku;
     private String name;

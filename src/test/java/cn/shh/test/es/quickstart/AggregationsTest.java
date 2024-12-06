@@ -18,11 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 作者：shh
- * 时间：2023/6/26
- * 版本：v1.0
- *
- * 聚合功能测试
+ * client elasticsearch-java 聚合操作
  */
 @Slf4j
 @SpringBootTest
@@ -53,10 +49,7 @@ public class AggregationsTest {
     @Test
     public void priceHistogram() throws Exception {
         //tag::price-histo-request
-        String searchText = "bike";
-
-        Query query = MatchQuery.of(m -> m.field("name").query(searchText))._toQuery();
-
+        Query query = MatchQuery.of(m -> m.field("name").query("bike"))._toQuery();
         SearchResponse<Void> response = elasticsearchClient.search(b -> b
                         .index("product")
                         .size(0) // <1>
@@ -66,8 +59,7 @@ public class AggregationsTest {
                                         .field("price")
                                         .interval(50.0)
                                 )
-                        ),
-                Void.class // <5>
+                        ), Void.class // <5>
         );
 
         List<HistogramBucket> buckets = response.aggregations()
@@ -76,8 +68,7 @@ public class AggregationsTest {
                 .buckets().array(); // <3>
 
         for (HistogramBucket bucket: buckets) {
-            log.info("There are " + bucket.docCount() +
-                    " bikes under " + bucket.key());
+            log.info("There are " + bucket.docCount() + " bikes under " + bucket.key());
         }
     }
 }

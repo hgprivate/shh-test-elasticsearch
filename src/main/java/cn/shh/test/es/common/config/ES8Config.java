@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,22 +30,27 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 
+@RequiredArgsConstructor
 //@EnableConfigurationProperties(ESProperties.class)
 //@Configuration
 public class ES8Config {
     private final String httpcacrt = "/Users/shh/Java/cache/certs/es/http_ca.crt";
-
+    private final ESProperties esProperties;
     @Bean
     public RestClient restClient(){
-        RestClient restClient = RestClient.builder(new HttpHost("192.168.0.10", 9200, "https"))
+        RestClient restClient = RestClient.builder(new HttpHost(esProperties.getAddress(), esProperties.getPort(), "https"))
                 .setHttpClientConfigCallback(httpAsyncClientBuilder -> {
                     try {
                         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                        // elastic / oI_awOKMD4jA2v7HqFIv
                         credentialsProvider.setCredentials(AuthScope.ANY,
-                                new UsernamePasswordCredentials("elastic", "oI_awOKMD4jA2v7HqFIv"));
-                        Path path = Paths.get(httpcacrt);
+                                new UsernamePasswordCredentials(esProperties.getUsername(), esProperties.getPassword()));
                         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-                        Certificate certificate = certificateFactory.generateCertificate(Files.newInputStream(path));
+                        // 方式1
+                        //Certificate certificate = certificateFactory.generateCertificate(Files.newInputStream(Paths.get(httpcacrt)));
+                        // 方式2
+                        InputStream is = getClass().getClassLoader().getResourceAsStream("certs/vm/elasticsearch-ca.pem");
+                        Certificate certificate = certificateFactory.generateCertificate(is);
 
 
                         KeyStore keyStore = KeyStore.getInstance("pkcs12");

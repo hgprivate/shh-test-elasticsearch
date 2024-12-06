@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test_elasticsearch?characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+    username: root
+    password: mysql368.cn
+  elasticsearch:
+    uris: https://192.168.6.10:9200
+    username: elastic
+    password: es368.cn
+    connection-timeout: 5s
+    socket-timeout: 30s
+    socket-keep-alive: false
+es:
+  address: 192.168.6.10
+  port: 9200
+  username: elastic
+  password: es368.cn

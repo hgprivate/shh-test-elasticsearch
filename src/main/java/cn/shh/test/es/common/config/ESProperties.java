@@ -8,4 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ESProperties {
     private String address;
     private Integer port;
+    private String username;
+    private String password;
 }

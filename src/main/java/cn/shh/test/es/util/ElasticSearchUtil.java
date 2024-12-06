@@ -4,21 +4,17 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.ssl.SSLContexts;
 import org.elasticsearch.client.RestClient;
 
 import javax.net.ssl.SSLContext;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,16 +31,16 @@ public class ElasticSearchUtil {
     private static final String httpp12 = "/Users/shh/Java/cache/certs/es/certs/http.p12";
     private static final String transportp12 = "/Users/shh/Java/cache/certs/es/certs/transport.p12";
     public static ElasticsearchClient elasticsearchClient(){
-        RestClient restClient = RestClient.builder(new HttpHost("192.168.0.10", 9200, "https"))
+        RestClient restClient = RestClient.builder(new HttpHost("127.0.0.1", 9200, "https"))
                 .setHttpClientConfigCallback(httpAsyncClientBuilder -> {
                     try {
                         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                         credentialsProvider.setCredentials(AuthScope.ANY,
-                                new UsernamePasswordCredentials("elastic", password));
-                        Path path = Paths.get(httpcacrt);
+                                new UsernamePasswordCredentials("elastic", "es368.cn"));
                         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-                        Certificate certificate = certificateFactory.generateCertificate(Files.newInputStream(path));
-
+                        //Certificate certificate = certificateFactory.generateCertificate(Files.newInputStream(Paths.get(httpcacrt)));
+                        InputStream is = ElasticSearchUtil.class.getClassLoader().getResourceAsStream("certs/vm/elasticsearch-ca.pem");
+                        Certificate certificate = certificateFactory.generateCertificate(is);
 
                         KeyStore keyStore = KeyStore.getInstance("pkcs12");
                         keyStore.load(null, null);
@@ -66,5 +62,4 @@ public class ElasticSearchUtil {
         ElasticsearchClient esClient = new ElasticsearchClient(transport);
         return esClient;
     }
-
 }
