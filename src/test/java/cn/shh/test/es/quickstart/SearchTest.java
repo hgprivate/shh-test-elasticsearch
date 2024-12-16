@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * client elasticsearch-java 搜索操作
+ * client elasticsearch-java 查询操作
  */
 @Slf4j
 @SpringBootTest
@@ -29,7 +29,7 @@ public class SearchTest {
     private ElasticsearchClient elasticsearchClient;
 
     /**
-     * 简单搜索
+     * 简单查询
      */
     @Test
     public void simpleSearch() throws IOException {
@@ -55,7 +55,7 @@ public class SearchTest {
     }
 
     /**
-     * 嵌套搜索
+     * 嵌套查询
      */
     @Test
     public void searchNested() throws Exception {
@@ -82,7 +82,7 @@ public class SearchTest {
     }
 
     /**
-     * 模板化搜索
+     * 模板化查询
      */
     @Test
     public void searchTemplate() throws Exception {

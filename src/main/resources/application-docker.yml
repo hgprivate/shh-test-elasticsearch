@@ -15,5 +15,5 @@ spring:
 es:
   address: 127.0.0.1
   port: 9200
-  username: elastic
-  password: eCdL0mg9Z7snI6w2Coxr
+#  username: elastic
+#  password: eCdL0mg9Z7snI6w2Coxr

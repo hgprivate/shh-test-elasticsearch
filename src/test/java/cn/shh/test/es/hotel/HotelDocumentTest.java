@@ -1,25 +1,30 @@
 package cn.shh.test.es.hotel;
 
 import cn.shh.test.es.pojo.Hotel;
+import cn.shh.test.es.pojo.HotelDoc;
 import cn.shh.test.es.service.IHotelService;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryVariant;
 import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
- * 索引hotel下的文档查询操作
+ * 针对索引hotel下文档的CRUD基础操作
  */
 @Slf4j
 @SpringBootTest
 public class HotelDocumentTest {
+    @Autowired
+    private IHotelService hotelService;
     @Autowired
     private ElasticsearchClient elasticsearchClient;
 
@@ -29,7 +34,7 @@ public class HotelDocumentTest {
     }
 
     /**
-     * 给 hotel index 添加一条文档数据
+     * 为索引 hotel 添加一条文档数据
      */
     @Test
     public void addDocument() throws IOException {
@@ -46,7 +51,35 @@ public class HotelDocumentTest {
     }
 
     /**
-     * 根据id获取文档
+     * 为索引 hotel 添加多条文档数据
+     * @throws IOException
+     */
+    @Test
+    public void addMoreDocument() throws IOException {
+        List<Hotel> hotels = hotelService.list();
+        BulkRequest.Builder builder = new BulkRequest.Builder();
+        for (Hotel hotel : hotels) {
+            HotelDoc hotelDoc = new HotelDoc(hotel);
+            builder.operations(op -> op
+                    .index(idx -> idx
+                            .index("hotel")
+                            .id(hotelDoc.getId().toString())
+                            .document(hotelDoc)
+                    )
+            );
+        }
+        BulkResponse bulkResponse = elasticsearchClient.bulk(builder.build());
+        if (bulkResponse.errors()) {
+            for (BulkResponseItem item : bulkResponse.items()) {
+                if (item.error() != null){
+                    log.error(item.error().reason());
+                }
+            }
+        }
+    }
+
+    /**
+     * 根据文档id查询一条文档数据
      */
     @Test
     public void getById() throws IOException {
@@ -61,12 +94,11 @@ public class HotelDocumentTest {
     }
 
     /**
-     * 修改文档
+     * 根据文档id和自定义字段值来修改一条文档
      */
     @Test
     public void updateDocument() throws IOException {
-        Hotel hotel = elasticsearchClient.get(g -> g
-                .index("hotel").id("12345678"), Hotel.class).source();
+        Hotel hotel = elasticsearchClient.get(g -> g.index("hotel").id("12345678"), Hotel.class).source();
         hotel.setName("测试酒店666");
         UpdateRequest.Builder builder = new UpdateRequest.Builder<Hotel, Hotel>();
         builder.index("hotel");
@@ -77,7 +109,7 @@ public class HotelDocumentTest {
     }
 
     /**
-     * 根据id删除文档
+     * 根据文档id删除一条文档
      */
     @Test
     public void deleteById() throws IOException {
@@ -89,7 +121,7 @@ public class HotelDocumentTest {
     }
 
     /**
-     * 根据条件删除文档
+     * 删除索引 hotel 下的所有文档数据
      */
     @Test
     public void deleteAll() throws IOException {
