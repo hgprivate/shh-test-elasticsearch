@@ -9,6 +9,7 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.*;
 import co.elastic.clients.json.JsonData;
+import co.elastic.clients.util.ObjectBuilderBase;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +55,8 @@ public class HotelDocSearchTest {
                 new SearchRequest.Builder().index("hotel")
                         .query(
                                 QueryBuilders.match()
-                                .field("name").query("如家")
-                                .build()._toQuery()
+                                        .field("name").query("如家")
+                                        .build()._toQuery()
                         ).build(), HotelDoc.class);
         handlerSearchResponse(searchResponse);
     }
@@ -71,9 +72,9 @@ public class HotelDocSearchTest {
                 new SearchRequest.Builder().index("hotel")
                         .query(
                                 QueryBuilders.multiMatch()
-                                .fields("name", "brand")
-                                .query("速8")
-                                .build()._toQuery()
+                                        .fields("name", "brand")
+                                        .query("速8")
+                                        .build()._toQuery()
                         ).build(), HotelDoc.class);
         List<Hit<HotelDoc>> hitList = searchResponse.hits().hits();
         for (Hit<HotelDoc> hotelHit : hitList) {
@@ -93,11 +94,41 @@ public class HotelDocSearchTest {
                 new SearchRequest.Builder().index("hotel")
                         .query(
                                 QueryBuilders.geoDistance()
-                                .field("location")
-                                .distance("2km")
-                                .location(geoLocationBuilder -> geoLocationBuilder.text("31.21, 121.5"))
-                                .build()._toQuery()
+                                        .field("location")
+                                        .distance("2km")
+                                        .location(geoLocationBuilder -> geoLocationBuilder.text("31.21, 121.5"))
+                                        .build()._toQuery()
                         ).build(), HotelDoc.class);
+        List<Hit<HotelDoc>> hitList = searchResponse.hits().hits();
+        for (Hit<HotelDoc> hotelHit : hitList) {
+            HotelDoc hotel = hotelHit.source();
+            log.info("hotel: {}", hotel);
+        }
+    }
+
+    /**
+     * 修改查询结果中文档的分数
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testFunScoreQuery() throws IOException {
+        SearchRequest searchRequest = SearchRequest.of(sqb -> sqb
+                .index("hotel")
+                .query(
+                        FunctionScoreQuery.of(builder -> builder
+                                .query(MatchQuery.of(mq -> mq.field("all").query("外滩"))._toQuery())
+                                .functions(
+                                        FunctionScore.of(
+                                                fc2 -> fc2.filter(
+                                                        qb -> qb.term(tq -> tq.field("brand").value("如家"))
+                                                ).weight(5.0)
+                                        )
+                                ).boostMode(FunctionBoostMode.Sum)
+                        )._toQuery()
+                )
+        );
+        SearchResponse<HotelDoc> searchResponse = elasticsearchClient.search(searchRequest, HotelDoc.class);
         List<Hit<HotelDoc>> hitList = searchResponse.hits().hits();
         for (Hit<HotelDoc> hotelHit : hitList) {
             HotelDoc hotel = hotelHit.source();
@@ -114,15 +145,15 @@ public class HotelDocSearchTest {
                 new SearchRequest.Builder().index("hotel")
                         .query(
                                 QueryBuilders.bool()
-                                .must(
-                                        QueryBuilders.term()
-                                        .field("city").value("上海")
-                                        .build()._toQuery()
-                                ).filter(
-                                        QueryBuilders.range()
-                                        .field("price").lte(JsonData.of(200))
-                                        .build()._toQuery()
-                                ).build()._toQuery()
+                                        .must(
+                                                QueryBuilders.term()
+                                                        .field("city").value("上海")
+                                                        .build()._toQuery()
+                                        ).filter(
+                                                QueryBuilders.range()
+                                                        .field("price").lte(JsonData.of(200))
+                                                        .build()._toQuery()
+                                        ).build()._toQuery()
                         ).build(), HotelDoc.class);
         handlerSearchResponse(boolSearchResponse);
     }
@@ -144,6 +175,7 @@ public class HotelDocSearchTest {
                 HotelDoc.class);
         handlerSearchResponse(searchResponse);
     }
+
     private void handlerSearchResponse(SearchResponse<HotelDoc> boolSearchResponse) {
         HitsMetadata<HotelDoc> hitsMetadata = boolSearchResponse.hits();
         log.info("数据条数：{}", hitsMetadata.total().value());
@@ -162,9 +194,9 @@ public class HotelDocSearchTest {
                 new SearchRequest.Builder().index("hotel")
                         .query(QueryBuilders.match().field("name").query("假日").build()._toQuery())
                         .highlight(hightlightBuilder -> hightlightBuilder
-                                        .fields("name", hightlightFieldBuilder -> hightlightFieldBuilder
-                                                        .matchedFields("name", "address")
-                                                        .requireFieldMatch(false))
+                                .fields("name", hightlightFieldBuilder -> hightlightFieldBuilder
+                                        .matchedFields("name", "address")
+                                        .requireFieldMatch(false))
                         ).build(), HotelDoc.class);
         log.info("searchResponse: {}", searchResponse);
         List<Hit<HotelDoc>> hitList = searchResponse.hits().hits();
@@ -185,7 +217,7 @@ public class HotelDocSearchTest {
                         .aggregations("brandAgg", aggBuilder -> aggBuilder.terms(
                                         termAggBuilder -> termAggBuilder.field("brand")
                                 ).aggregations("priceStats", aggBuilder2 -> aggBuilder2.stats(
-                                                statsAggBuilder -> statsAggBuilder.field("price"))
+                                        statsAggBuilder -> statsAggBuilder.field("price"))
                                 )
                         ).build(), HotelDoc.class);
         List<StringTermsBucket> stringTermsBuckets = searchResponse.aggregations()
